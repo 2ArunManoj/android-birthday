@@ -2,16 +2,14 @@ package com.tam.birthday.fragments;
 
 import android.annotation.SuppressLint;
 
+import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.test.mock.MockCursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +19,8 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import com.tam.birthday.R;
+import com.tam.birthday.adapters.ContactsAdapter;
+import com.tam.birthday.listeners.OnContactsInteractionListener;
 import com.tam.birthday.loaders.MockedCursorLoader;
 import com.tam.birthday.testdb.MySQLiteHelper;
 
@@ -66,7 +66,11 @@ public class ContactsListFragment extends Fragment implements LoaderManager.Load
     // A content URI for the selected contact
     Uri contactUri;
     // An adapter that binds the result Cursor to the ListView
-    private SimpleCursorAdapter cursorAdapter;
+    private ContactsAdapter cursorAdapter;
+
+    // Contact selected listener that allows the activity holding this fragment to be notified of
+    // a contact being selected
+    private OnContactsInteractionListener contactsInteractionListener;
 
     private static final String[] PROJECTION = {
             // TODO: these needs to be changed according what we retrieve from facebook or google APIs
@@ -94,37 +98,33 @@ public class ContactsListFragment extends Fragment implements LoaderManager.Load
 
         contactsList = (ListView) getActivity().findViewById(android.R.id.list);
 
-        contactsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(), "Item clicked", Toast.LENGTH_LONG);
-            }
-        });
-
-        contactsList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(), "Item selected - onItemSelected", Toast.LENGTH_LONG);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                Toast.makeText(getActivity(), "Item selected - onNothingSelected", Toast.LENGTH_LONG);
-            }
-        });
-
         //set up the cursorAdapter for the list
-        cursorAdapter = new SimpleCursorAdapter(getActivity(),
+        /*cursorAdapter = new SimpleCursorAdapter(getActivity(),
                 R.layout.custom_list_view,
                 null,
                 FROM_COLUMNS, TO_IDS,
-                0);
+                0);*/
+        cursorAdapter = new ContactsAdapter(getContext());
 
+        // set the adapter to the cursor.
         contactsList.setAdapter(cursorAdapter);
 
+        contactsList.setOnItemClickListener(this);
 
-
+        // initialize the loader to get the data from either from facebook, google+ or local db if it populated.
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            contactsInteractionListener = (OnContactsInteractionListener) super.getActivity();
+        } catch (ClassCastException classCastEx) {
+            throw new ClassCastException(super.getActivity().toString() + " must implement the interface OnContactsInteractionListener");
+        }
+
     }
 
     @Override
@@ -145,8 +145,10 @@ public class ContactsListFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(parent.getContext(), "An item got selected. display the details of this item",
-                Toast.LENGTH_LONG);
+        //TODO: need to find a view in which we can communicate the unique ID of a contact back to the activity
+        //TODO: so that it can display the details section for it.
+
+        contactsInteractionListener.onContactSelected();
     }
 
 

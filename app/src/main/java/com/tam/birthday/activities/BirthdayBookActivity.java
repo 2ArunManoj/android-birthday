@@ -11,8 +11,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.tam.birthday.R;
+import com.tam.birthday.listeners.OnContactsInteractionListener;
 
-public class BirthdayBookActivity extends AppCompatActivity {
+public class BirthdayBookActivity extends AppCompatActivity implements OnContactsInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,23 +27,18 @@ public class BirthdayBookActivity extends AppCompatActivity {
         // TODO: http://developer.android.com/training/search/setup.html
         // TODO: http://developer.android.com/guide/topics/search/search-dialog.html
 
-        ListView lv = (ListView) findViewById(android.R.id.list);
-        lv.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), "item clicked in activity", Toast.LENGTH_LONG);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        //TODO: all our settings has to go here. Like notify x time before the birthday
+        //TODO: example is the bday is on 10th March, then notification will start a 7 days before so that he can buy a gift
+        //TODO: There will be one more notification when it is just 2 or 3 days are left.
+        //TODO: On the day of bday also there will be notification where you can leave a wish via whatsapp.
+        //TODO: A LOT OF THINGS CAN BE DONE HERE in the settings like have a fixed message for everyone etc.
+
+        //TODO: we will use shared preference to store the settings data
         getMenuInflater().inflate(R.menu.menu_birthday, menu);
         return true;
     }
@@ -60,5 +56,15 @@ public class BirthdayBookActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onContactSelected() {
+        Toast.makeText(getBaseContext(), "A contact has been selected", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onSelectionCleared() {
+
     }
 }

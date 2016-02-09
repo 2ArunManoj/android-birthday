@@ -28,6 +28,9 @@ public class MockedCursorLoader extends CursorLoader {
         }
         try {
             BirthdayDataProvider birthdayDataProvider = BirthdayDataProvider.getInstance(getContext());
+            // Didn't like the same data coming up again and again.
+            birthdayDataProvider.cleanUpOldData();
+
             birthdayDataProvider.insertMockData();
 
             Cursor cursor = birthdayDataProvider.getAllBirthdayInfo();

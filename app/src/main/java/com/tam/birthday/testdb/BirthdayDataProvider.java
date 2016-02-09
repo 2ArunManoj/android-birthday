@@ -32,7 +32,7 @@ public class BirthdayDataProvider {
     public void insertMockData() {
         try {
             sqLiteDatabase = mySQLiteHelper.getWritableDatabase();
-
+            
             // insert Arun's data
             ContentValues arunBdayData = new ContentValues();
             arunBdayData.put(MySQLiteHelper._ID, 0);
@@ -103,6 +103,19 @@ public class BirthdayDataProvider {
         }*/
 
         return cursor;
+    }
+
+    public void cleanUpOldData() {
+        try {
+            sqLiteDatabase = mySQLiteHelper.getReadableDatabase();
+
+            sqLiteDatabase.delete(MySQLiteHelper.BIRTHDAY_TABLE, null, null);
+        } catch(Exception ex) {
+            Log.e(tag, "Could not clean up old data in the table. Reason - " + ex.getMessage());
+        } finally {
+            sqLiteDatabase.close();
+            mySQLiteHelper.close();
+        }
     }
 
 }
